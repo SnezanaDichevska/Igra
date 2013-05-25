@@ -8,7 +8,7 @@ using BubbleTrouble.Properties;
 namespace BubbleTrouble
 {
     public enum DIRECTION { right, left };
-    public enum PLAYERID {player1, player2, player3 };
+    public enum PLAYERID { player1, player2, player3 };
     public enum BOUNDS { left, right, top, down };
 
     public class Player
@@ -34,7 +34,7 @@ namespace BubbleTrouble
             isShooting = new bool();
             isShooting = false;
             isKilled = new bool();
-            isKilled=false;
+            isKilled = false;
             direction = DIRECTION.left;
 
             switch (playerId) //ova mozda ke treba u form poso go predavam po reference sekade
@@ -79,12 +79,12 @@ namespace BubbleTrouble
             {
                 case DIRECTION.right:
                     X += 8;
-                    if (X >= worldWidth - 50) 
+                    if (X >= worldWidth - 50)
                         X = worldWidth - 50;
                     break;
                 case DIRECTION.left:
                     X -= 8;
-                    if (X < -5) 
+                    if (X < -5)
                         X = -5;
                     break;
             }
@@ -94,7 +94,7 @@ namespace BubbleTrouble
         {
             if (IsWalking)
             {
-                g.DrawImage(playerProfileImg, X, Y, playerProfileImg.Width, playerProfileImg.Height);            
+                g.DrawImage(playerProfileImg, X, Y, playerProfileImg.Width, playerProfileImg.Height);
             }
             else
                 g.DrawImage(playerBackImg, X, Y, playerBackImg.Width, playerBackImg.Height);
@@ -112,8 +112,8 @@ namespace BubbleTrouble
                 double distance = (Xc - BallXc) * (Xc - BallXc) + (Yc - BallYc) * (Yc - BallYc);
                 double playerRadius = 20;
                 if (distance <= ((ball.Radius + playerRadius) * (ball.Radius + playerRadius)))
-                       return true;
-                   // return false; // da ne zamara
+                    return true;
+                // return false; // da ne zamara
             }
             return false;
         }

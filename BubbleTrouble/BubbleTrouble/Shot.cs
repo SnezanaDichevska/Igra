@@ -50,11 +50,17 @@ namespace BubbleTrouble
         {
             if (ShootingPoints.Count > 0)
             {
-                g.DrawCurve(shootingPen, ShootingPoints.ToArray());
-                g.TranslateTransform(1, 0);
-                g.DrawCurve(shootingPen1, ShootingPoints.ToArray());
-                g.ResetTransform();
-
+                try
+                {
+                    g.DrawCurve(shootingPen, ShootingPoints.ToArray());
+                    g.TranslateTransform(1, 0);
+                    g.DrawCurve(shootingPen1, ShootingPoints.ToArray());
+                    g.ResetTransform();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Shot.cs-Draw-EXCEPTION :  {0}", e.Message);
+                }
                 //STRELKA
                 Point lastOne = (Point)ShootingPoints[ShootingPoints.Count-1];
                 trianglePoints = new Point[3];

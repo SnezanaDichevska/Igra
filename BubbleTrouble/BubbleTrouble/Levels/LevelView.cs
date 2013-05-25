@@ -9,6 +9,8 @@ namespace BubbleTrouble
 {
     public class LevelView : View
     {
+        public List<Ball> Balls;
+        public Ball ball { set; get; }
         public Image lifeImg { set; get; }
         public Image statusBarImg { set; get; }
         public Image levelImg { set; get; }
@@ -23,8 +25,10 @@ namespace BubbleTrouble
             this.levelImg = levelImg;
             this.numLives = numLives;
             this.scores = scores;
+            
            
         }
+        public virtual void resetBalls(int width,int height) { }
 
         //display the background of the status bar
         protected  void drawStatusBar(Graphics g, Rectangle ClientRectangle)
@@ -50,7 +54,7 @@ namespace BubbleTrouble
         //display the number of current level
         protected  void drawLevel(Graphics g, Rectangle ClientRectangle)
         {
-            g.DrawImage(this.levelImg, ClientRectangle.X + 620, ClientRectangle.Y + 430);
+            g.DrawImage(this.levelImg, ClientRectangle.X + 630, ClientRectangle.Y + 430,48,44);
         }
 
         //draw the background

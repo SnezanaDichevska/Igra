@@ -36,6 +36,8 @@
             this.button_player1 = new System.Windows.Forms.Button();
             this.button_player2 = new System.Windows.Forms.Button();
             this.button_player3 = new System.Windows.Forms.Button();
+            this.lblScore = new System.Windows.Forms.Label();
+            this.finScore = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button_BACK
@@ -126,11 +128,33 @@
             this.button_player3.Visible = false;
             this.button_player3.Click += new System.EventHandler(this.button_player3_Click);
             // 
+            // lblScore
+            // 
+            this.lblScore.AutoSize = true;
+            this.lblScore.Font = new System.Drawing.Font("Ravie", 11.25F);
+            this.lblScore.Location = new System.Drawing.Point(195, 440);
+            this.lblScore.Name = "lblScore";
+            this.lblScore.Size = new System.Drawing.Size(0, 21);
+            this.lblScore.TabIndex = 8;
+            this.lblScore.Visible = false;
+            // 
+            // finScore
+            // 
+            this.finScore.AutoSize = true;
+            this.finScore.Font = new System.Drawing.Font("Ravie", 11.25F);
+            this.finScore.Location = new System.Drawing.Point(488, 244);
+            this.finScore.Name = "finScore";
+            this.finScore.Size = new System.Drawing.Size(0, 21);
+            this.finScore.TabIndex = 9;
+            this.finScore.Visible = false;
+            // 
             // Game
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 262);
+            this.Controls.Add(this.finScore);
+            this.Controls.Add(this.lblScore);
             this.Controls.Add(this.button_player3);
             this.Controls.Add(this.button_player2);
             this.Controls.Add(this.button_player1);
@@ -145,6 +169,7 @@
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -158,6 +183,8 @@
         private System.Windows.Forms.Button button_player1;
         private System.Windows.Forms.Button button_player2;
         private System.Windows.Forms.Button button_player3;
+        private System.Windows.Forms.Label lblScore;
+        private System.Windows.Forms.Label finScore;
     }
 }
 

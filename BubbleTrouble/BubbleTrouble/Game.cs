@@ -20,7 +20,7 @@ namespace BubbleTrouble
         public Player player { set; get; }
         public PLAYERID playerId { set; get; }
         public Ball ball { set; get; }
-        public List<Ball> Balls;
+        public List<Ball> Balls{ set; get; }
         public Shot Shot;
         public ProgressBar pbTime;
         public View currentView;
@@ -40,6 +40,12 @@ namespace BubbleTrouble
             this.Width = 700 + 15;
             this.Height = 520;
 
+            //labeli za score
+            lblScore.BackColor = Color.Transparent;
+            finScore.BackColor = Color.Transparent;
+            lblScore.Size = new Size(21, 21);
+            finScore.Size = new Size(21, 21);
+
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -52,34 +58,27 @@ namespace BubbleTrouble
             this.scores = 0;
             this.numLives = 5;
 
-            Invalidate();
+            
         }
 
 
         public void startGame()
         {
-            Shot = new Shot();
-            Balls = new List<Ball>();
+            this.Shot = new Shot();
+            this.Balls = new List<Ball>();
             this.playerId = playerId;
             LevelView currentLevel = (LevelView)currentView;
-
             player = new Player(this.Width / 2, this.Height - currentLevel.statusBarImg.Height - 91, playerId);
             player.IsWalking = false;
 
-            //biggest ball
-            ball = new Ball(30, 40, this.Width, this.Height, 40, Math.PI / 4);
-            //Balls.Add(ball);
-            //middle ball
-            ball = new Ball(this.Width - 115, 180, this.Width, this.Height, 32, 3 * Math.PI / 4);
-            // Balls.Add(ball);
-            //small ball
-            ball = new Ball(30, 220, this.Width, this.Height, 20, Math.PI / 4);
-            // Balls.Add(ball);
-            //smallest ball
-            ball = new Ball(this.Width - 115, 270, this.Width, this.Height, 8, 3 * Math.PI / 4);
-            Balls.Add(ball);
-
+            currentLevel.resetBalls(this.Width,this.Height);
+            foreach (Ball b in currentLevel.Balls)
+            {
+                Balls.Add(b);
+            }
             pbTime = new ProgressBar(10, 412, this.Width - 5, 5);
+
+            finScore.Visible = false;
 
             this.timer1.Interval = INTERVAL;
             this.timer1.Enabled = true;
@@ -96,13 +95,16 @@ namespace BubbleTrouble
 
             if (currentView.GetType() == typeof(MainMenuView) ||
                 currentView.GetType() == typeof(ChoosePlayerView) ||
-                currentView.GetType() == typeof(InstructionsView)||
+                currentView.GetType() == typeof(InstructionsView) ||
                 currentView.GetType() == typeof(ScoreView))
             {
                 currentView.drawView(g, this.ClientRectangle);
                 if (currentView.GetType() == typeof(ScoreView))
                 {
                     this.enableAllScoreViewControls();
+                    lblScore.Visible = false;
+                    this.finScore.Visible = true;
+                    finScore.Text = lblScore.Text;
                 }
             }
 
@@ -110,93 +112,126 @@ namespace BubbleTrouble
             {
                 //iscrtuvanje na scenata
                 currentView.drawView(g, this.ClientRectangle);
-
-                //iscrtuvanje na topkite
-                foreach (Ball ball in Balls)
-                {
-                    ball.DrawBall(g);
-                }
                 //iscrtuvanje na igracot
                 player.DrawPlayer(g, this.ClientRectangle);
 
-
-                //  ako igracot e pogoden od topka igrata zavrsuva ili istece vremeto
-                if (player.isHit(Balls) || pbTime.timeUp())
-                {
-                    timer1.Stop();
-                    //  if it's the last round draw the circle around the player and allow score View
-                    if (numLives == 1)
+                if (Balls.Count() == 0)
+                { 
+                    
+                    if (currentView.GetType() != typeof(ThirdLevelView))
                     {
-
-                        player.isKilled = true;
                         this.Update();
-
-                        //otkako ke gi izgubi site zivoti
-                        //broi 15 ticks
-                        //za vreme na broenjeto se zatemnuva
-                        //i posle ide na gameOver(showScore)
-                        if (ticksCounter >= 25)
+                        if (ticksCounter >= 65)
                         {
-                            currentView = new ScoreView();
-                            currentView.drawView(g, this.ClientRectangle);
                             ticksCounter = 0;
-
+                            player.isKilled = false;
+                            this.nextLevel();
+                            this.startGame();
+                            Invalidate();
                         }
                         else
                         {
                             ticksCounter++;
-                            if (pbTime.timeUp())
-                            {
-                                Brush brush = new SolidBrush(Color.FromArgb(30, Color.Black));
-                                g.FillRectangle(brush, 0, 0, currentView.backgroundImg.Width, currentView.backgroundImg.Height);
-                            }
-                            else this.roundOver(this.player.X - 25, this.player.Y - 10, 100, g, this.ClientRectangle);
+                            //za congrats Level 1 completed etc...
+                            lblScore.Visible = false;
+                             g.DrawImage(Resources.start,0,0,this.Width,this.Height);
+
                         }
-                        Invalidate();
                     }
-                    //if it's not the last round when the player is killed wait for 10 ticks and replay the round
                     else
                     {
-                        if (ticksCounter >= 10)
+                        if (ticksCounter >= 65)
                         {
-
+                            currentView = new ScoreView();
+                            this.enableAllScoreViewControls();
                             ticksCounter = 0;
-
-
-                            player.isKilled = false;
-                            replayLevel();
-
-
+                            this.lblScore.Visible = false;
+                            Invalidate();
                         }
                         else
                         {
-                            player.isKilled = true;
                             ticksCounter++;
-                            if (pbTime.timeUp())
-                            {
-                                Brush brush = new SolidBrush(Color.FromArgb(30, Color.Black));
-                                g.FillRectangle(brush, 0, 0, currentView.backgroundImg.Width, currentView.backgroundImg.Height);
-                            }
-                            else this.roundOver(this.player.X - 25, this.player.Y - 10, 100, g, this.ClientRectangle);
+
                         }
+                        
                     }
-                    Invalidate();
+                    
+                }
+           else
+           {
+                    //iscrtuvanje na topkite
+                    foreach (Ball ball in Balls)
+                    {
+                        ball.DrawBall(g);
+                    }
+                   
+                    //  ako igracot e pogoden od topka igrata zavrsuva ili istece vremeto
+                    if (player.isHit(Balls) || pbTime.timeUp())
+                    {
+                        timer1.Stop();
+                        //  if it's the last round draw the circle around the player and allow score View
+                        if (numLives == 1)
+                        {
 
+                            player.isKilled = true;
+                            this.Update();
+
+                            //otkako ke gi izgubi site zivoti
+                            //broi 15 ticks
+                            //za vreme na broenjeto se zatemnuva
+                            //i posle ide na gameOver(showScore)
+                            if (ticksCounter >= 35)
+                            {
+                                currentView = new ScoreView();
+                                currentView.drawView(g, this.ClientRectangle);
+                                ticksCounter = 0;
+
+                            }
+                            else
+                            {
+                                ticksCounter++;
+                                if (pbTime.timeUp())
+                                {
+                                    Brush brush = new SolidBrush(Color.FromArgb(30, Color.Black));
+                                    g.FillRectangle(brush, 0, 0, currentView.backgroundImg.Width, currentView.backgroundImg.Height);
+                                }
+                                else this.roundOver(this.player.X - 25, this.player.Y - 10, 100, g, this.ClientRectangle);
+                            }
+                            Invalidate();
+                        }
+                        //if it's not the last round when the player is killed wait for 10 ticks and replay the round
+                        else
+                        {
+                            if (ticksCounter >= 30)
+                            {
+                                ticksCounter = 0;
+                                player.isKilled = false;
+                                replayLevel();
+                            }
+                            else
+                            {
+                                player.isKilled = true;
+                                ticksCounter++;
+                                if (pbTime.timeUp())
+                                {
+                                    Brush brush = new SolidBrush(Color.FromArgb(30, Color.Black));
+                                    g.FillRectangle(brush, 0, 0, currentView.backgroundImg.Width, currentView.backgroundImg.Height);
+                                }
+                                else this.roundOver(this.player.X - 25, this.player.Y - 10, 100, g, this.ClientRectangle);
+                            }
+                        }
+                        Invalidate();
+
+                    }
+                    //iscrtuvanje na progres barot
+                    pbTime.DrawPB(g);
                 }
 
-
-
-                //iscrtuvanje na linijata za pukanje
-                if (player.isShooting && Shot.numTicks > 0 && Shot.numTicks < 150)
-                {
-                    Shot.Draw(g, player);
-                }
-
-                //iscrtuvanje na progres barot
-                pbTime.DrawPB(g);
-
+               //iscrtuvanje na linijata za pukanje
+               if (player.isShooting && Shot.numTicks < 150)
+               {  Shot.Draw(g, player);
+               }
             }
-
         }
 
 
@@ -204,6 +239,7 @@ namespace BubbleTrouble
         {
             numLives -= 1;
             LevelView curr = (LevelView)currentView;
+            curr.resetBalls(this.Width,this.Height);
             curr.numLives = numLives;
             if (numLives > 0)
             {
@@ -211,7 +247,20 @@ namespace BubbleTrouble
             }
         }
 
+        public void nextLevel()
+        {
+            lblScore.Visible = true;
+            if(currentView.GetType() == typeof(FirstLevelView))
+            {
+                currentView = new SecondLevelView(this.numLives, this.scores);
+           } 
+            else if (currentView.GetType() == typeof(SecondLevelView))
+            {
+                currentView = new ThirdLevelView(this.numLives, this.scores);
+            }
+            
 
+        }
 
         public void roundOver(float playerCoordinateX, float playerCoordinateY, float radius, Graphics g, Rectangle ClientRectangle)
         {
@@ -290,7 +339,7 @@ namespace BubbleTrouble
             {
                 player.isShooting = false;
             }
-            Shot.numTicks++;
+             Shot.numTicks++;
 
             pbTime.timeChange++;
 
@@ -310,6 +359,7 @@ namespace BubbleTrouble
                         if (!Balls[i].isHit)
                             if (Balls[i].isHitBall(Shot.ShootingPoints[j]))
                             {
+                                ticksCounter = 0;
                                 Balls[i].bubble = Resources.explosion;
                                 Balls[i].isHit = true;
                                 player.isShooting = false;
@@ -325,11 +375,13 @@ namespace BubbleTrouble
             }
 
 
-            for (int i = Balls.Count - 1; i >= 0; i--)
-            {
+            for (int i = Balls.Count - 1; i >= 0;  i--)
+             {
                 Ball current = Balls[i];
                 if (current.isHit)
                 {
+                    ticksCounter = 0;
+                    
                     if (Balls[i].Time >= 2)
                     {
                         Balls.RemoveAt(i);
@@ -340,20 +392,27 @@ namespace BubbleTrouble
                                 Balls.Add(ball);
                                 ball = new Ball(current.X - 40, current.Y, this.Width, this.Height, 32, -3 * Math.PI / 4);
                                 Balls.Add(ball);
+                                this.scores += 10;
                                 break;
                             case 32:
                                 ball = new Ball(current.X + 30, current.Y, this.Width, this.Height, 20, -Math.PI / 4);
                                 Balls.Add(ball);
                                 ball = new Ball(current.X - 30, current.Y, this.Width, this.Height, 20, -3 * Math.PI / 4);
                                 Balls.Add(ball);
+                                this.scores += 15;
                                 break;
                             case 20:
                                 ball = new Ball(current.X + 20, current.Y, this.Width, this.Height, 8, -Math.PI / 4);
                                 Balls.Add(ball);
                                 ball = new Ball(current.X - 20, current.Y, this.Width, this.Height, 8, -3 * Math.PI / 4);
                                 Balls.Add(ball);
+                                this.scores += 20;
+                                break;
+                            case 8:
+                                this.scores += 25;
                                 break;
                         }
+                        lblScore.Text = scores.ToString();
                     }
                     break;
                 }
@@ -368,6 +427,7 @@ namespace BubbleTrouble
             this.button_NewGAME = mainManuView.disableMainMenuView_newGAME_Button(this.button_NewGAME);
             this.button_choosePLAYER = mainManuView.disableMainMenuView_choosePLAYER_Button(this.button_choosePLAYER);
             this.button_INSTRCTIONS = mainManuView.disableMainMenuView_INSTRCTIONS_Button(this.button_INSTRCTIONS);
+            this.finScore.Visible = false;
         }
         private void enableAllMainMenuControls()
         {
@@ -376,7 +436,7 @@ namespace BubbleTrouble
             this.button_NewGAME = mainManuView.enableMainMenuView_newGAME_Button(this.button_NewGAME);
             this.button_choosePLAYER = mainManuView.enableMainMenuView_choosePLAYER_Button(this.button_choosePLAYER);
             this.button_INSTRCTIONS = mainManuView.enableMainMenuView_INSTRCTIONS_Button(this.button_INSTRCTIONS);
-
+            this.finScore.Visible = false;
         }
 
         private void disableAllChoosePlayerMenuControls()
@@ -386,6 +446,7 @@ namespace BubbleTrouble
             this.button_player2 = choosePlayerView.disableChoosePlayerView_player2_Button(this.button_player2);
             this.button_player3 = choosePlayerView.disableChoosePlayerView_player3_Button(this.button_player3);
             this.button_BACK = choosePlayerView.disableChoosePlayerView_BACK_Button(this.button_BACK);
+            this.finScore.Visible = false;
         }
         private void enableAllChoosePlayerMenuControls()
         {
@@ -416,6 +477,7 @@ namespace BubbleTrouble
         {
             InstructionsView instructionsView = (InstructionsView)currentView;
             this.button_BACK = instructionsView.disableInstructionsView_BACK_Button(this.button_BACK);
+            this.finScore.Visible = false;
         }
 
         private void button_NewGAME_Click(object sender, EventArgs e)
@@ -423,6 +485,9 @@ namespace BubbleTrouble
             this.disableAllMainMenuControls();
             currentView = new FirstLevelView(numLives, scores);
             this.startGame();
+            this.lblScore.Visible = true;
+            scores = 0;
+            lblScore.Text = scores.ToString();
             Invalidate();
         }
 

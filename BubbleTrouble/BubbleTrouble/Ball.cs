@@ -46,7 +46,7 @@ namespace BubbleTrouble
             switch (Radius)
             {
                 case 40: //mozni radiusi se 40, 32, 20, 8 => moze da gi staveme u enum
-                    bubble = Resources.rball6;
+                    bubble = Resources.rball61;
                     up = 0;
                     down = 365;
                     left = -45;

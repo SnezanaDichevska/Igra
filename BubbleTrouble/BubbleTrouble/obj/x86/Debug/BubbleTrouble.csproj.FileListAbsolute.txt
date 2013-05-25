@@ -5,3 +5,4 @@ C:\Users\Windows\Desktop\BubbleTrouble\BubbleTrouble\bin\Debug\BubbleTrouble.exe
 C:\Users\Windows\Desktop\BubbleTrouble\BubbleTrouble\bin\Debug\BubbleTrouble.pdb
 C:\Users\Windows\Desktop\BubbleTrouble\BubbleTrouble\obj\x86\Debug\BubbleTrouble.exe
 C:\Users\Windows\Desktop\BubbleTrouble\BubbleTrouble\obj\x86\Debug\BubbleTrouble.pdb
+C:\Users\Windows\Desktop\BubbleTrouble\BubbleTrouble\obj\x86\Debug\BubbleTrouble.csprojResolveAssemblyReference.cache
